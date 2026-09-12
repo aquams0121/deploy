@@ -1,24 +1,27 @@
 import streamlit as st
-import streamlit.components.v1 as components
-
+ 
 st.set_page_config(page_title="잠신 플래너", layout="wide")
-
-# Streamlit 기본 여백/패딩을 없애서 화면이 최대한 그대로 보이게 함
+ 
+BACKEND_URL = st.secrets.get("BACKEND_URL", "https://your-app-name.onrender.com")
+ 
+# Streamlit 자체 여백/헤더를 없애고, iframe이 브라우저 창 전체를 꽉 채우도록 함
+# (내용이 짧아도 남는 검은 배경이 보이지 않음, 내부는 iframe 안에서 자체 스크롤)
 st.markdown(
-    """
+    f"""
     <style>
-        .block-container {padding: 0 !important; max-width: 100% !important;}
-        header {visibility: hidden;}
-        iframe {border: none;}
+        header {{visibility: hidden;}}
+        .block-container {{padding: 0 !important; max-width: 100% !important;}}
+        [data-testid="stAppViewContainer"] {{padding: 0 !important;}}
+        iframe {{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            border: none;
+        }}
     </style>
+    <iframe src="{BACKEND_URL}"></iframe>
     """,
     unsafe_allow_html=True,
 )
-
-# Render 등에 배포한 백엔드(=index.html까지 함께 서빙하는 FastAPI 서버) 주소.
-# 1) Streamlit Cloud > 앱 설정 > Secrets 에 아래처럼 넣어두면 코드 수정 없이 바꿀 수 있음:
-#    BACKEND_URL = "https://your-app-name.onrender.com"
-# 2) secrets가 없으면 아래 기본값을 직접 수정해서 사용.
-BACKEND_URL = st.secrets.get("BACKEND_URL", "https://your-app-name.onrender.com")
-
-components.iframe(src=BACKEND_URL, height=1000, scrolling=True)
